@@ -6,7 +6,7 @@
  */
 
 
-let font, bpdots, consola
+let font, bpdots, consola, vehicleHomePoints
 let vehicles = []
 let instructions
 
@@ -31,17 +31,9 @@ function setup() {
 
     vehicles = []
 
-    let points = addTwosDay()
+    vehicleHomePoints = addTwosDay()
 
-    for (let i = 0; i < points.length; i++) {
-        let pt = points[i]
-        let vehicleHue = int(map(i, 0, points.length - 1,
-            0, 360))
-
-        let vehicleColor = color([vehicleHue, 80, 80])
-
-        vehicles.push(new Vehicle(pt.x, pt.y, vehicleColor))
-    }
+    initializeVehicles(vehicleHomePoints)
 
     cnv.parent('#canvas')
     colorMode(HSB, 360, 100, 100, 100)
@@ -50,7 +42,7 @@ function setup() {
     /* initialize instruction div */
     instructions = select('#ins')
     instructions.html(`<pre>
-        [1,2,3,4,5] → no function
+        [1,2,3] → happy twosday, giant 2, big "Liya"
         z → freeze sketch</pre>`)
 }
 
@@ -58,7 +50,7 @@ function setup() {
 function draw() {
     background(234, 34, 24)
 
-    let gravity = new p5.Vector(0, 0.1)
+    // let gravity = new p5.Vector(0, 0.1)
 
     for (let i = 0; i < vehicles.length; i++) {
         let v = vehicles[i]
@@ -98,6 +90,19 @@ function keyPressed() {
         instructions.html(`<pre>
             sketch stopped</pre>`)
     }
+
+    if (key === "1") {
+        let points = addTwosDay()
+        changeVehicleHomes(points)
+    }
+    if (key === "2") {
+        let points = addGiantTwo()
+        changeVehicleHomes(points)
+    }
+    if (key === "3") {
+        let points = addBigLiya()
+        changeVehicleHomes(points)
+    }
 }
 
 /** returns text point locations for "happy twosday! 2.22.22 2:22pm", centered
@@ -135,4 +140,89 @@ function addGiantTwo() {
     return consola.textToPoints('2', 200, 280, 384, {
         sampleFactor: 0.2
     })
+}
+
+
+// code to initialize vehicles
+function initializeVehicles(points) {
+    // we have to clear the vehicles array because otherwise we'll always be
+    // adding vehicles, so we'll have very low framerate and different scenes!
+    vehicles = []
+    for (let i = 0; i < points.length; i++) {
+        let pt = points[i]
+        let vehicleHue = int(map(i, 0, points.length - 1,
+            0, 360))
+
+        let vehicleColor = color([vehicleHue, 80, 80])
+
+        vehicles.push(new Vehicle(pt.x, pt.y, vehicleColor))
+
+        vehicleHomePoints = points
+    }
+}
+
+
+/*
+    Pseudocode:
+        given: array points.
+
+        if points.length > vehicles.length, iterate through vehicles.
+        find point at variable i.
+        find vehicle "v" at variable i.
+        set v.target to that point. (it's a PVector)
+        add more vehicles until vehicle array length === point array length.
+        set vehicleHomePoints to points
+
+        tracing: points.length > vehicles.length
+        points.length = 2
+        vehicles.length = 1
+        i = 0
+        v = vehicles[0]
+        pt = points[1]
+        v.target = pt
+        vehicles.length after adding vehicles: 2
+        vehicleHomePoints = points
+
+        Tracing successful
+
+        if points.length === vehicles.length, do the same thing as first case.
+
+        if points.length < vehicles.length, iterate through points.
+        find vehicle "v" at variable i.
+        find point "pt" at variable i.
+        set v.target to that point.
+
+        remove the rest of the vehicles.
+*/
+
+function changeVehicleHomes(points) {
+    if (points.length >= vehicles.length) {
+        for (let i = 0; i < vehicles.length; i++) {
+            let pt = points[i]
+            let v = vehicles[i]
+
+            // for some reason, v.target = pt doesn't work.
+            v.target.x = pt.x
+            v.target.y = pt.y
+        }
+
+        for (let i = vehicles.length; i < points.length; i++) {
+            // add a new vehicle
+            let pt = points[i]
+
+            vehicles.push(new Vehicle(pt.x, pt.y, 0))
+        }
+    } else {
+        // set the vehicle homes
+        for (let i = 0; i < points.length; i++) {
+            let pt = points[i]
+            let v = vehicles[i]
+
+            v.target.x = pt.x
+            v.target.y = pt.y
+        }
+
+        // remove unnecessary vehicles
+        vehicles.splice(points.length)
+    }
 }
