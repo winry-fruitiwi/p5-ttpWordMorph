@@ -6,12 +6,18 @@
  */
 
 
+// font, bpdots.otf, consola.ttf, vehicle home points when initialized.
 let font, bpdots, consola, vehicleHomePoints
+
+// vehicles array.
 let vehicles = []
+
+// instructions for controls.
 let instructions
 
 
 function preload() {
+    // font initialization
     consola = loadFont('data/consola.ttf')
     bpdots = loadFont('data/bpdots.otf')
     font = loadFont('data/consola.ttf')
@@ -50,19 +56,15 @@ function setup() {
 function draw() {
     background(234, 34, 24)
 
-    // let gravity = new p5.Vector(0, 0.1)
-
+    // draw the vehicles.
     for (let i = 0; i < vehicles.length; i++) {
         let v = vehicles[i]
         v.update()
         v.show()
-        noStroke()
-        // circle(mouseX, mouseY, 80)
-        stroke(220, 80, 100);
-        strokeWeight(5)
         v.behaviors()
     }
 
+    // display useful debug info.
     displayDebugCorner()
 }
 
@@ -91,14 +93,19 @@ function keyPressed() {
             sketch stopped</pre>`)
     }
 
+    // change to twosday message
     if (key === "1") {
         let points = addTwosDay()
         changeVehicleHomes(points)
     }
+
+    // change to giant two
     if (key === "2") {
         let points = addGiantTwo()
         changeVehicleHomes(points)
     }
+
+    // change to big "Liya" message
     if (key === "3") {
         let points = addBigLiya()
         changeVehicleHomes(points)
@@ -196,6 +203,7 @@ function initializeVehicles(points) {
 */
 
 function changeVehicleHomes(points) {
+    // if there are more new points, set the vehicle targets.
     if (points.length >= vehicles.length) {
         for (let i = 0; i < vehicles.length; i++) {
             let pt = points[i]
@@ -206,12 +214,19 @@ function changeVehicleHomes(points) {
             v.target.y = pt.y
         }
 
+        // after setting the targets we need to make new vehicles.
         for (let i = vehicles.length; i < points.length; i++) {
             // add a new vehicle
             let pt = points[i]
 
-            vehicles.push(new Vehicle(pt.x, pt.y, 0))
-        }
+            let vehicleHue = int(map(i, 0, points.length - 1,
+                0, 360))
+
+            let vehicleColor = color([vehicleHue, 80, 80])
+
+            vehicles.push(new Vehicle(pt.x, pt.y, vehicleColor))
+        } // if there are less new points, we set the vehicle targets and
+        // remove the rest of the unnecessary vehicles.
     } else {
         // set the vehicle homes
         for (let i = 0; i < points.length; i++) {
