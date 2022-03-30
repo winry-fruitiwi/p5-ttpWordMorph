@@ -5,6 +5,9 @@
  *
  */
 
+let emitter
+let particles
+let gravity
 
 // font, bpdots.otf, consola.ttf, vehicle home points when initialized.
 let font, bpdots, consola, vehicleHomePoints
@@ -36,6 +39,9 @@ function setup() {
     strokeWeight(5)
 
     vehicles = []
+    particles = []
+    emitter = new Emitter(1)
+    gravity = new p5.Vector(0, 0.05)
 
     vehicleHomePoints = addTwosDay()
 
@@ -63,6 +69,10 @@ function draw() {
         v.show()
         v.behaviors()
     }
+
+    emitter.show()
+    emitter.emit()
+    emitter.update()
 
     // display useful debug info.
     displayDebugCorner()
@@ -116,12 +126,12 @@ function keyPressed() {
  *  313 points
  */
 function addTwosDay() {
-    let pts = bpdots.textToPoints('happy twosday!', 100, 100, 48, {
+    let pts = bpdots.textToPoints('happy twosday!', 100, 130, 48, {
         sampleFactor: 0.01, // increase for more points
         // simplifyThreshold: 0 // increase to remove collinear points
     })
 
-    pts = pts.concat(bpdots.textToPoints('2.22.22 2:22pm', 90, 175, 48, {
+    pts = pts.concat(bpdots.textToPoints('2.22.22 2:22pm', 90, 205, 48, {
         sampleFactor: 0.06, // increase for more points
     }))
 
@@ -133,7 +143,7 @@ function addTwosDay() {
  *  313 points
  */
 function addBigLiya() {
-    return consola.textToPoints('Liya', 50, 200, 224, {
+    return consola.textToPoints('Liya', 50, 230, 224, {
         sampleFactor: 0.2, // increase for more points
         // simplifyThreshold: 0 // increase to remove collinear points
     })
@@ -144,7 +154,7 @@ function addBigLiya() {
  *  237 points
  */
 function addGiantTwo() {
-    return consola.textToPoints('2', 200, 280, 384, {
+    return consola.textToPoints('2', 200, 320, 384, {
         sampleFactor: 0.2
     })
 }
